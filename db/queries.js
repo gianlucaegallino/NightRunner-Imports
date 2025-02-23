@@ -205,7 +205,85 @@ async function updateTransmission(id, type) {
 
 // --------------- INSERT queries ---------------
 
-//TODO: Make inserts
+async function insertAspiration(type) {
+  let contents = pool.query("INSERT INTO aspirations (type) VALUES ($1)", [
+    type,
+  ]);
+  return contents;
+}
+
+async function insertBrand(name, year, founder) {
+  let contents = pool.query(
+    "INSERT INTO brands (name, year_est, founder) VALUES ($1, $2, $3)",
+    [name, year, founder]
+  );
+  return contents;
+}
+
+async function insertCar(carData) {
+  //Destructure the car data object
+  const {
+    name,
+    brand,
+    engine_type,
+    engine_size,
+    hp,
+    torque,
+    top_speed,
+    weight,
+    year,
+    color,
+    mileage,
+    drivetrain,
+    transmission,
+    aspiration,
+  } = carData;
+
+  let contents = pool.query(
+    "INSERT INTO cars (name, brand, engine_type, engine_size, hp, torque, top_speed, weight, year, color mileage, drivetrain, transmission, aspiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+    [
+      name,
+      brand,
+      engine_type,
+      engine_size,
+      hp,
+      torque,
+      top_speed,
+      weight,
+      year,
+      color,
+      mileage,
+      drivetrain,
+      transmission,
+      aspiration,
+    ]
+  );
+  return contents;
+}
+
+async function insertColor(name) {
+  let contents = pool.query("INSERT INTO colors (name) VALUES ($1)", [name]);
+  return contents;
+}
+
+async function insertDrivetrain(type) {
+  let contents = pool.query("INSERT INTO drivetrains (type) VALUES ($1) ", [
+    type,
+  ]);
+  return contents;
+}
+
+async function insertEngine(type) {
+  let contents = pool.query("INSERT INTO engines(type) VALUES ($1)", [type]);
+  return contents;
+}
+
+async function insertTransmission(type) {
+  let contents = pool.query("INSERT INTO transmissions (type) VALUES ($1)", [
+    type,
+  ]);
+  return contents;
+}
 
 module.exports = {
   getAllAspirations,
@@ -236,4 +314,11 @@ module.exports = {
   updateDrivetrain,
   updateEngine,
   updateTransmission,
+  insertAspiration,
+  insertBrand,
+  insertCar,
+  insertColor,
+  insertDrivetrain,
+  insertEngine,
+  insertTransmission
 };
