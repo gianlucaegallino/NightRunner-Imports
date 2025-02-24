@@ -26,7 +26,7 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Drivetrain not found" });
     }
 
-    res.render("itemListPage", {
+    res.render("itemDetailPage", {
       title: "Drivetrain",
       messages: messages.rows,
     });

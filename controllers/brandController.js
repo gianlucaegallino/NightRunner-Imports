@@ -26,7 +26,7 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Brand not found" });
     }
 
-    res.render("itemListPage", {
+    res.render("itemDetailPage", {
       title: "Brand",
       messages: messages.rows,
     });

@@ -26,7 +26,7 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Transmission not found" });
     }
 
-    res.render("itemListPage", {
+    res.render("itemDetailPage", {
       title: "Transmission",
       messages: messages.rows,
     });

@@ -26,7 +26,7 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Color not found" });
     }
 
-    res.render("itemListPage", {
+    res.render("itemDetailPage", {
       title: "Color",
       messages: messages.rows,
     });
