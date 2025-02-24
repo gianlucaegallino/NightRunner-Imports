@@ -17,7 +17,7 @@ async function getAll(req, res) {
 }
 
 async function getSpecific(req, res) {
-  let id = req.body.id;
+  let id = req.params.id;
 
   try {
     const messages = await db.getBrand(id);
@@ -37,7 +37,7 @@ async function getSpecific(req, res) {
 }
 
 async function postModification(req, res) {
-  let id = req.body.id;
+  let id = req.params.id;
   let name = req.body.name;
   let year = req.body.year;
   let founder = req.body.founder;
@@ -80,7 +80,7 @@ async function postAddition(req, res) {
 }
 
 async function postDeletion(req, res) {
-  let id = req.body.id;
+  let id = req.params.id;
 
   try {
     const deleted = await db.deleteBrand(id);

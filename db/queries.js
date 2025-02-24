@@ -17,6 +17,35 @@ async function getAllCars() {
   return contents;
 }
 
+async function getAllCarsJoined() {
+  let contents = pool.query(`
+    SELECT
+      cars.id,
+      cars.modelname AS "Model",
+      brands.name AS "Brand",
+      engines.type AS "Engine type",
+      cars.enginesize AS "Engine size",
+      cars.horsepower AS "Horsepower",
+      cars.torque AS "Torque (NM)",
+      cars.weightkg AS "Weight (KG)",
+      cars.year AS "Year",
+      colors.name AS "Color",
+      cars.mileage AS "Mileage",
+      drivetrains.type AS "Drivetrain",
+      transmissions.type AS "Gearbox",
+      aspirations.type AS "Aspiration"
+    FROM
+        cars
+    JOIN brands ON cars.brandid = brands.id
+    JOIN engines ON cars.engineid = engines.id
+    JOIN colors ON cars.colorid = colors.id
+    JOIN drivetrains ON cars.drivetrainid = drivetrains.id
+    JOIN transmissions ON cars.transmissionid = transmissions.id
+    JOIN aspirations ON cars.aspirationid = aspirations.id;
+`);
+  return contents;
+}
+
 async function getAllColors() {
   let contents = pool.query("SELECT * FROM colors");
   return contents;
@@ -289,6 +318,7 @@ module.exports = {
   getAllAspirations,
   getAllBrands,
   getAllCars,
+  getAllCarsJoined,
   getAllColors,
   getAllDrivetrains,
   getAllEngines,
@@ -320,5 +350,5 @@ module.exports = {
   insertColor,
   insertDrivetrain,
   insertEngine,
-  insertTransmission
+  insertTransmission,
 };

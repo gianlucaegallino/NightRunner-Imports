@@ -2,7 +2,7 @@ const db = require("../db/queries");
 
 async function getAll(req, res) {
   try {
-    const messages = await db.getAllCars();
+    const messages = await db.getAllCarsJoined();
     if (!messages) {
       return res.status(404).json({ message: "Car not found" });
     }
@@ -17,7 +17,7 @@ async function getAll(req, res) {
 }
 
 async function getSpecific(req, res) {
-  let id = req.body.id;
+  let id = req.params.id;
 
   try {
     const messages = await db.getCar(id);
