@@ -1,3 +1,107 @@
 const db = require("../db/queries");
 
-//TODO: this
+async function getAll(req, res) {
+  try {
+    const messages = await db.getAllBrands();
+    if (!messages) {
+      return res.status(404).json({ message: "Brand not found" });
+    }
+    res.render("itemListPage", {
+      title: "All Brands",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function getSpecific(req, res) {
+  let id = req.body.id;
+
+  try {
+    const messages = await db.getBrand(id);
+
+    if (!messages) {
+      return res.status(404).json({ message: "Brand not found" });
+    }
+
+    res.render("itemListPage", {
+      title: "Brand",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function postModification(req, res) {
+  let id = req.body.id;
+  let name = req.body.name;
+  let year = req.body.year;
+  let founder = req.body.founder;
+
+  try {
+    const updated = await db.updateBrand(id, name, year, founder);
+
+    if (!updated) {
+      return res.status(404).json({ message: "Brand not found" });
+    }
+
+    res.json({ message: "Brand updated successfully", target: updated });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+
+  res.redirect("/");
+}
+
+async function postAddition(req, res) {
+    let name = req.body.name;
+    let year = req.body.year;
+    let founder = req.body.founder;
+
+  try {
+    const inserted = await db.insertBrand(name, year, founder);
+
+    if (!inserted) {
+      return res.status(404).json({ message: "Insert Brand failed" });
+    }
+
+    res.json({ message: "Brand inserted successfully", target: inserted });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+
+  res.redirect("/");
+}
+
+async function postDeletion(req, res) {
+  let id = req.body.id;
+
+  try {
+    const deleted = await db.deleteBrand(id);
+
+    if (!deleted) {
+      return res.status(404).json({ message: "Brand not found" });
+    }
+
+    res.json({ message: "Brand deleted successfully", target: deleted });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+
+  res.redirect("/");
+}
+
+module.exports = {
+  getAll,
+  getSpecific,
+  postAddition,
+  postDeletion,
+  postModification,
+};
