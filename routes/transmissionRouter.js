@@ -9,4 +9,4 @@ transmissionRouter.post("/:id/delete", transmissionController.postDeletion);
 transmissionRouter.post("/new", transmissionController.postAddition);
 
 
-module.exports = transmissionController;
+module.exports = transmissionRouter;

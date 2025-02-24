@@ -10,4 +10,4 @@ carRouter.post("/:id/delete", carController.postDeletion);
 carRouter.post("/new", carController.postAddition);
 
 
-module.exports = carController;
+module.exports = carRouter;

@@ -9,4 +9,4 @@ colorRouter.post("/:id/delete", colorController.postDeletion);
 colorRouter.post("/new", colorController.postAddition);
 
 
-module.exports = colorController;
+module.exports = colorRouter;

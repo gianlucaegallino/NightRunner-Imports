@@ -10,4 +10,4 @@ aspirationRouter.post("/:id/delete", aspirationController.postDeletion);
 aspirationRouter.post("/new", aspirationController.postAddition);
 
 
-module.exports = aspirationController;
+module.exports = aspirationRouter;

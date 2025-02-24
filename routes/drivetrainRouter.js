@@ -10,4 +10,4 @@ drivetrainRouter.post("/:id/delete", drivetrainController.postDeletion);
 drivetrainRouter.post("/new", drivetrainController.postAddition);
 
 
-module.exports = drivetrainController;
+module.exports = drivetrainRouter;

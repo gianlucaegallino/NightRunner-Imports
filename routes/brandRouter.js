@@ -9,4 +9,4 @@ brandRouter.post("/:id/delete", brandController.postDeletion);
 brandRouter.post("/new", brandController.postAddition);
 
 
-module.exports = brandController;
+module.exports = brandRouter;
