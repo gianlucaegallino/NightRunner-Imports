@@ -7,6 +7,23 @@
   <body>
     <h1>This should render: <%= title %></h1>
     <h2>This will be its contents.</h2>
-    <p><%= messages %></p>
+
+    <table border="1">
+      <thead>
+        <% if (messages.length > 0) { Object.keys(messages[0]).forEach(key => {
+        %>
+        <th><%= key.charAt(0).toUpperCase() + key.slice(1) %></th>
+        <% }); } %>
+      </thead>
+      <tbody>
+        <% if (messages.length > 0) { messages.forEach(message => { %>
+        <tr>
+          <%Object.values(message).forEach(ob => { %>
+          <td><%= ob %></td>
+          <% }); %>
+        </tr>
+        <%} )} %>
+      </tbody>
+    </table>
   </body>
 </html>
