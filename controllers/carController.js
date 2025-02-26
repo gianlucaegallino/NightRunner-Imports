@@ -26,8 +26,32 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
+    console.log(messages)
+
     res.render("itemDetailPage", {
       title: "Car",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function getModification(req, res) {
+  let id = req.params.id;
+
+  try {
+    const messages = await db.getCar(id);
+
+    if (!messages) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    console.log(messages)
+
+    res.render("itemEditPage", {
+      title: "Edit Car",
       messages: messages.rows,
     });
   } catch (error) {
@@ -128,6 +152,7 @@ async function postDeletion(req, res) {
 module.exports = {
   getAll,
   getSpecific,
+  getModification,
   postAddition,
   postDeletion,
   postModification,

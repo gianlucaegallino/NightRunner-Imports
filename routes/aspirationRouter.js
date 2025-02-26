@@ -5,6 +5,7 @@ const aspirationRouter = Router();
 
 aspirationRouter.get("/", aspirationController.getAll);
 aspirationRouter.get("/:id", aspirationController.getSpecific);
+aspirationRouter.get("/:id/update", aspirationController.getModification);
 aspirationRouter.post("/:id/update", aspirationController.postModification);
 aspirationRouter.post("/:id/delete", aspirationController.postDeletion);
 aspirationRouter.post("/new", aspirationController.postAddition);

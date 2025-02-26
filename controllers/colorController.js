@@ -36,6 +36,26 @@ async function getSpecific(req, res) {
   }
 }
 
+async function getModification(req, res) {
+  let id = req.params.id;
+
+  try {
+    const messages = await db.getColor(id);
+
+    if (!messages) {
+      return res.status(404).json({ message: "Color not found" });
+    }
+
+    res.render("itemEditPage", {
+      title: "Edit Color",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 async function postModification(req, res) {
   let id = req.params.id;
   let name = req.body.name;
@@ -97,6 +117,7 @@ async function postDeletion(req, res) {
 module.exports = {
   getAll,
   getSpecific,
+  getModification,
   postAddition,
   postDeletion,
   postModification,

@@ -4,6 +4,7 @@ const brandRouter = Router();
 
 brandRouter.get("/", brandController.getAll);
 brandRouter.get("/:id", brandController.getSpecific);
+brandRouter.get("/:id/update", brandController.getModification);
 brandRouter.post("/:id/update", brandController.postModification);
 brandRouter.post("/:id/delete", brandController.postDeletion);
 brandRouter.post("/new", brandController.postAddition);

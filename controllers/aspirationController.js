@@ -36,6 +36,26 @@ async function getSpecific(req, res) {
   }
 }
 
+async function getModification(req, res) {
+  let id = req.params.id;
+
+  try {
+    const messages = await db.getAspiration(id);
+
+    if (!messages) {
+      return res.status(404).json({ message: "Aspiration not found" });
+    }
+
+    res.render("itemEditPage", {
+      title: "Edit Aspiration",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
 async function postModification(req, res) {
   let id = req.params.id;
   let type = req.body.type;
@@ -97,6 +117,7 @@ async function postDeletion(req, res) {
 module.exports = {
   getAll,
   getSpecific,
+  getModification,getSpecific,
   postAddition,
   postDeletion,
   postModification,

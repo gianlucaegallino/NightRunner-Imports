@@ -23,11 +23,31 @@ async function getSpecific(req, res) {
     const messages = await db.getTransmission(id);
 
     if (!messages) {
-      return res.status(404).json({ message: "Transmission not found" });
+      return res.status(404).json({ message: "Transmission notgetSpecific found" });
     }
 
     res.render("itemDetailPage", {
       title: "Transmission",
+      messages: messages.rows,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+}
+
+async function getModification(req, res) {
+  let id = req.params.id;
+
+  try {
+    const messages = await db.getTransmission(id);
+
+    if (!messages) {
+      return res.status(404).json({ message: "Transmission notgetSpecific found" });
+    }
+
+    res.render("itemEditPage", {
+      title: "Edit Transmission",
       messages: messages.rows,
     });
   } catch (error) {
@@ -97,6 +117,7 @@ async function postDeletion(req, res) {
 module.exports = {
   getAll,
   getSpecific,
+  getModification,
   postAddition,
   postDeletion,
   postModification,
