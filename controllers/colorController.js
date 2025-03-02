@@ -29,6 +29,8 @@ async function getSpecific(req, res) {
     res.render("itemDetailPage", {
       title: "Color",
       messages: messages.rows,
+      pathname: "color",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);

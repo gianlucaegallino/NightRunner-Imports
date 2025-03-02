@@ -161,40 +161,38 @@ async function updateBrand(id, name, year, founder) {
 async function updateCar(id, carData) {
   //Destructure the car data object
   const {
-    name,
-    brand,
-    engine_type,
-    engine_size,
-    hp,
+    modelname,
+    brandid,
+    engineid,
+    enginesize,
+    horsepower,
     torque,
-    top_speed,
-    weight,
+    weightkg,
     year,
-    color,
+    colorid,
     mileage,
-    drivetrain,
-    transmission,
-    aspiration,
+    drivetrainid,
+    transmissionid,
+    aspirationid,
   } = carData;
 
   let contents = pool.query(
-    "UPDATE cars SET name = $1, brand = $2, engine_type = $3, engine_size = $4, hp = $5, torque = $6,  top_speed = $7, weight = $8, year = $9, color = $10, mileage = $11, drivetrain = $12, transmission = $13, aspiration = $14 WHERE id = $15",
+    "UPDATE cars SET modelname = $1, brandid = $2, engineid = $3, enginesize = $4, horsepower = $5, torque = $6,  weightkg = $7, year = $8, colorid = $9, mileage = $10, drivetrainid = $11, transmissionid = $12, aspirationid = $13 WHERE id = $14",
     [
-      name,
-      brand,
-      engine_type,
-      engine_size,
-      hp,
+      modelname,
+      brandid,
+      engineid,
+      enginesize,
+      horsepower,
       torque,
-      top_speed,
-      weight,
+      weightkg,
       year,
-      color,
+      colorid,
       mileage,
-      drivetrain,
-      transmission,
-      aspiration,
-      id,
+      drivetrainid,
+      transmissionid,
+      aspirationid,
+      id
     ]
   );
   return contents;

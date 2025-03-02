@@ -31,6 +31,8 @@ async function getSpecific(req, res) {
     res.render("itemDetailPage", {
       title: "Car",
       messages: messages.rows,
+      pathname: "car",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -63,7 +65,7 @@ async function getModification(req, res) {
 }
 
 async function postModification(req, res) {
-  let id = req.body.id;
+  let id = req.params.id;
 
   // builds the cardata object
   let carData = {

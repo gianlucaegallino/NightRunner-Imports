@@ -29,6 +29,8 @@ async function getSpecific(req, res) {
     res.render("itemDetailPage", {
       title: "Brand",
       messages: messages.rows,
+      pathname: "brand",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -62,7 +64,7 @@ async function getModification(req, res) {
 async function postModification(req, res) {
   let id = req.params.id;
   let name = req.body.name;
-  let year = req.body.year;
+  let year = req.body.year_est;
   let founder = req.body.founder;
 
   try {

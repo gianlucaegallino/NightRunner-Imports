@@ -29,6 +29,8 @@ async function getSpecific(req, res) {
     res.render("itemDetailPage", {
       title: "Aspiration",
       messages: messages.rows,
+      pathname: "aspiration",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
