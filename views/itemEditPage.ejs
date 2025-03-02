@@ -8,31 +8,28 @@
     <h1><%= title %></h1>
     <h2>This will be its contents.</h2>
 
-    <form>
-      <% if (messages.length > 0) { let keys = Object.keys(messages[0]); let
-      vals = Object.values(messages[0]); %>
-      <p>Object Identifier: <%=vals[0]%></p>
+    <%if (messages.length > 0) {%>
+    <form
+      method="POST"
+      action="/<%= pathname %>/<%= fieldId %>/update"
+      class="form"
+    >
+      <% let keys = Object.keys(messages[0]); let vals =
+      Object.values(messages[0]); %>
+      <p>Object Identifier: <%=fieldId%></p>
 
-      <% 
-      const foreignKeyFields = {
-    brand_id: "brands",
-    engine_type_id: "engine_types",
-    color_id: "colors"
-};
-
-      
-      for (let i = 1; i < keys.length; i++){ %>
+      <% for (let i = 1; i < keys.length;
+      i++){ %>
 
       <div className="myInput">
         <label>
           <%=keys[i]%>
-          <input value="<%=vals[i]%>" type="text" placeholder="<%=keys[i]%>" />
+          <input value="<%=vals[i]%>" type="text" name="<%=keys[i]%>" placeholder="<%=keys[i]%>" />
         </label>
       </div>
 
       <% }} %>
+      <button type="submit">Save entry</button>
     </form>
-
-    <button>Save entry</button>
   </body>
 </html>

@@ -46,9 +46,12 @@ async function getModification(req, res) {
       return res.status(404).json({ message: "Aspiration not found" });
     }
 
+    console.log(messages)
     res.render("itemEditPage", {
       title: "Edit Aspiration",
       messages: messages.rows,
+      pathname: "aspiration",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -67,10 +70,10 @@ async function postModification(req, res) {
       return res.status(404).json({ message: "Aspiration not found" });
     }
 
-    res.json({ message: "Aspiration updated successfully", target: updated });
+    
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+
   }
 
   res.redirect("/");

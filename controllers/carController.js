@@ -53,6 +53,8 @@ async function getModification(req, res) {
     res.render("itemEditPage", {
       title: "Edit Car",
       messages: messages.rows,
+      pathname: "car",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -87,10 +89,10 @@ async function postModification(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
-    res.json({ message: "Car updated successfully", target: updated });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+
   }
 
   res.redirect("/");

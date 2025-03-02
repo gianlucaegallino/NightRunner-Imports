@@ -49,6 +49,8 @@ async function getModification(req, res) {
     res.render("itemEditPage", {
       title: "Edit Color",
       messages: messages.rows,
+      pathname: "color",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -67,10 +69,10 @@ async function postModification(req, res) {
       return res.status(404).json({ message: "Color not found" });
     }
 
-    res.json({ message: "Color updated successfully", target: updated });
+   
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+
   }
 
   res.redirect("/");

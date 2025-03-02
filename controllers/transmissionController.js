@@ -49,6 +49,8 @@ async function getModification(req, res) {
     res.render("itemEditPage", {
       title: "Edit Transmission",
       messages: messages.rows,
+      pathname: "transmission",
+      fieldId: id
     });
   } catch (error) {
     console.error(error);
@@ -67,10 +69,10 @@ async function postModification(req, res) {
       return res.status(404).json({ message: "Transmission not found" });
     }
 
-    res.json({ message: "Transmission updated successfully", target: updated });
+    
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+
   }
 
   res.redirect("/");
