@@ -1,5 +1,8 @@
 const db = require("../db/queries");
 
+
+//TODO: agregar
+
 async function getAll(req, res) {
   try {
     const messages = await db.getAllCarsJoined();
@@ -26,7 +29,6 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
-    console.log(messages)
 
     res.render("itemDetailPage", {
       title: "Car",
@@ -42,6 +44,17 @@ async function getSpecific(req, res) {
 
 async function getModification(req, res) {
   let id = req.params.id;
+  //gets fields from other tables to display in dropdown menus.
+
+  //Declares fields to be interpreted as dropdown fields in reference to other tables
+  const FKFields = {
+    brandid: await db.getIdNameBrands(),
+    engineid: await db.getIdNameEngines(),
+    colorid: await db.getIdNameColors(),
+    drivetrainid: await db.getIdNameDrivetrains(),
+    transmissionid: await db.getIdNameTransmissions(),
+    aspirationid: await db.getIdNameAspirations(),
+  }
 
   try {
     const messages = await db.getCar(id);
@@ -50,13 +63,14 @@ async function getModification(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
-    console.log(messages)
+
 
     res.render("itemEditPage", {
       title: "Edit Car",
       messages: messages.rows,
       pathname: "car",
-      fieldId: id
+      fieldId: id, 
+      FKFields: FKFields
     });
   } catch (error) {
     console.error(error);

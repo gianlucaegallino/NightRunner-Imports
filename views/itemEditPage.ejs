@@ -18,18 +18,87 @@
       Object.values(messages[0]); %>
       <p>Object Identifier: <%=fieldId%></p>
 
-      <% for (let i = 1; i < keys.length;
-      i++){ %>
+      <%
+      
+      //if the object is empty
+      if (Object.keys(FKFields).length === 0){ 
+
+        for (let i = 1; i < keys.length; i++){ %>
 
       <div className="myInput">
         <label>
           <%=keys[i]%>
-          <input value="<%=vals[i]%>" type="text" name="<%=keys[i]%>" placeholder="<%=keys[i]%>" />
+          <input
+            value="<%=vals[i]%>"
+            type="text"
+            name="<%=keys[i]%>"
+            placeholder="<%=keys[i]%>"
+          />
         </label>
       </div>
 
-      <% }} %>
+      <%} }else{ let keynames = Object.keys(FKFields); 
+        
+        for (let i = 1; i <
+      keys.length; i++){ 
+        
+        if(keynames.includes(keys[i])){ %>
+      <div className="myDropdown">
+        <label>
+          <%=keys[i]%>
+          <select name="<%=keys[i]%>" id="<%=keys[i]%>">
+            <%
+            for(let j  = 0; j<FKFields[`${keys[i]}`].rows.length; j++){
+                %>
+                <option value="<%=Object.values(FKFields[`${keys[i]}`].rows[j])[0]%>" 
+                  
+                  <%
+                  if (Object.values(FKFields[`${keys[i]}`].rows[j])[0] === vals[i]){
+                  %>
+                  selected
+                  <%
+                  }
+                  %>
+                  ><%=Object.values(FKFields[`${keys[i]}`].rows[j])[1]%></option>
+                <%
+              }
+            %>
+            
+            
+          </select>
+        </label>
+      </div>
+      <% } else{       %>
+
+      <div className="myInput">
+        <label>
+          <%=keys[i]%>
+          <input
+            value="<%=vals[i]%>"
+            type="text"
+            name="<%=keys[i]%>"
+            placeholder="<%=keys[i]%>"
+          />
+        </label>
+      </div>
+
+      <%}} } } %>
       <button type="submit">Save entry</button>
     </form>
+
+
+    <% 
+      if (notifications){
+        console.log(notifications[0])
+        for (let i = 0; i< Object.keys(notifications).length;i++){
+          %>
+          <p><%=notifications[i].msg%></p>
+          <%
+        }
+      }
+    %>
+
+    
+
   </body>
 </html>

@@ -1,4 +1,19 @@
+const { body, validationResult } = require("express-validator");
 const db = require("../db/queries");
+
+const alphaErr = "must be non numeric.";
+const lengthErr = "must be between 1 and 64 characters.";
+
+//TODO: fix isnumeric validations
+const validateColor = [
+  body("name")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 64 })
+    .withMessage(`Type ${lengthErr}`),
+];
 
 async function getAll(req, res) {
   try {
@@ -30,7 +45,7 @@ async function getSpecific(req, res) {
       title: "Color",
       messages: messages.rows,
       pathname: "color",
-      fieldId: id
+      fieldId: id,
     });
   } catch (error) {
     console.error(error);
@@ -52,7 +67,9 @@ async function getModification(req, res) {
       title: "Edit Color",
       messages: messages.rows,
       pathname: "color",
-      fieldId: id
+      fieldId: id,
+      FKFields: {},
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
@@ -60,25 +77,54 @@ async function getModification(req, res) {
   }
 }
 
-async function postModification(req, res) {
-  let id = req.params.id;
-  let name = req.body.name;
+let postModification = [
+  validateColor,
+  async (req, res) => {
+    let id = req.params.id;
+    let name = req.body.name;
 
-  try {
-    const updated = await db.updateColor(id, name);
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getColor(id);
+        return res.status(400).render("itemEditPage", {
+          title: "Edit Color",
+          messages: messages.rows,
+          pathname: "color",
+          fieldId: id,
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
 
-    if (!updated) {
-      return res.status(404).json({ message: "Color not found" });
+      const updated = await db.updateColor(id, name);
+
+      if (!updated) {
+        const messages = await db.getColor(id);
+        return res.status(404).render("itemEditPage", {
+          title: "Edit Color",
+          messages: messages.rows,
+          pathname: "color",
+          fieldId: id,
+          FKFields: {},
+          notifications: [{ msg: "Color update failed." }],
+        });
+      }
+
+      const messages = await db.getColor(id);
+      return res.status(400).render("itemEditPage", {
+        title: "Edit Color",
+        messages: messages.rows,
+        pathname: "color",
+        fieldId: id,
+        FKFields: {},
+        notifications: [{ msg: "Updated successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-   
-  } catch (error) {
-    console.error(error);
-
-  }
-
-  res.redirect("/");
-}
+  },
+];
 
 async function postAddition(req, res) {
   let name = req.body.name;

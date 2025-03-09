@@ -1,4 +1,19 @@
+const { body, validationResult } = require("express-validator");
 const db = require("../db/queries");
+
+const alphaErr = "must be non numeric.";
+const lengthErr = "must be between 1 and 32 characters.";
+
+//TODO: fix isnumeric validations
+const validateTransmission = [
+  body("type")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 32 })
+    .withMessage(`Type ${lengthErr}`),
+];
 
 async function getAll(req, res) {
   try {
@@ -23,14 +38,14 @@ async function getSpecific(req, res) {
     const messages = await db.getTransmission(id);
 
     if (!messages) {
-      return res.status(404).json({ message: "Transmission notgetSpecific found" });
+      return res.status(404).json({ message: "Transmission not found" });
     }
 
     res.render("itemDetailPage", {
       title: "Transmission",
       messages: messages.rows,
       pathname: "transmission",
-      fieldId: id
+      fieldId: id,
     });
   } catch (error) {
     console.error(error);
@@ -45,14 +60,16 @@ async function getModification(req, res) {
     const messages = await db.getTransmission(id);
 
     if (!messages) {
-      return res.status(404).json({ message: "Transmission notgetSpecific found" });
+      return res.status(404).json({ message: "Transmission not found" });
     }
 
     res.render("itemEditPage", {
       title: "Edit Transmission",
       messages: messages.rows,
       pathname: "transmission",
-      fieldId: id
+      fieldId: id,
+      FKFields: {},
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
@@ -60,25 +77,54 @@ async function getModification(req, res) {
   }
 }
 
-async function postModification(req, res) {
-  let id = req.params.id;
-  let type = req.body.type;
+let postModification = [
+  validateTransmission,
+  async (req, res) => {
+    let id = req.params.id;
+    let type = req.body.type;
 
-  try {
-    const updated = await db.updateTransmission(id, type);
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getTransmission(id);
+        return res.status(400).render("itemEditPage", {
+          title: "Edit Transmission",
+          messages: messages.rows,
+          pathname: "transmission",
+          fieldId: id,
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
 
-    if (!updated) {
-      return res.status(404).json({ message: "Transmission not found" });
+      const updated = await db.updateTransmission(id, type);
+
+      if (!updated) {
+        const messages = await db.getTransmission(id);
+        return res.status(404).render("itemEditPage", {
+          title: "Edit Transmission",
+          messages: messages.rows,
+          pathname: "transmission",
+          fieldId: id,
+          FKFields: {},
+          notifications: [{ msg: "Transmission update failed." }],
+        });
+      }
+
+      const messages = await db.getTransmission(id);
+      return res.status(400).render("itemEditPage", {
+        title: "Edit Transmission",
+        messages: messages.rows,
+        pathname: "transmission",
+        fieldId: id,
+        FKFields: {},
+        notifications: [{ msg: "Updated successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-    
-  } catch (error) {
-    console.error(error);
-
-  }
-
-  res.redirect("/");
-}
+  },
+];
 
 async function postAddition(req, res) {
   let type = req.body.type;
@@ -90,7 +136,10 @@ async function postAddition(req, res) {
       return res.status(404).json({ message: "Insert Transmission failed" });
     }
 
-    res.json({ message: "Transmission inserted successfully", target: inserted });
+    res.json({
+      message: "Transmission inserted successfully",
+      target: inserted,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

@@ -1,4 +1,7 @@
+const { body, validationResult } = require("express-validator");
 const db = require("../db/queries");
+
+//TODO: agregar
 
 async function getAll(req, res) {
   try {
@@ -53,7 +56,8 @@ async function getModification(req, res) {
       title: "Edit Brand",
       messages: messages.rows,
       pathname: "brand",
-      fieldId: id
+      fieldId: id,
+      FKFields: {},
     });
   } catch (error) {
     console.error(error);

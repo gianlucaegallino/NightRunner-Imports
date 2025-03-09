@@ -66,6 +66,44 @@ async function getAllTransmissions() {
   return contents;
 }
 
+
+// --------------- Name and Id SELECT queries ---------------
+
+async function getIdNameAspirations() {
+  let contents = pool.query("SELECT id, type FROM aspirations");
+  return contents;
+}
+
+async function getIdNameBrands() {
+  let contents = pool.query("SELECT id, name FROM brands");
+  return contents;
+}
+
+async function getIdNameCars() {
+  let contents = pool.query("SELECT id, modelname FROM cars");
+  return contents;
+}
+
+async function getIdNameColors() {
+  let contents = pool.query("SELECT id, name FROM colors");
+  return contents;
+}
+
+async function getIdNameDrivetrains() {
+  let contents = pool.query("SELECT id, type FROM drivetrains");
+  return contents;
+}
+
+async function getIdNameEngines() {
+  let contents = pool.query("SELECT id, type FROM engines");
+  return contents;
+}
+
+async function getIdNameTransmissions() {
+  let contents = pool.query("SELECT id, type FROM transmissions");
+  return contents;
+}
+
 // --------------- Individual SELECT queries ---------------
 
 async function getAspiration(id) {
@@ -321,6 +359,13 @@ module.exports = {
   getAllDrivetrains,
   getAllEngines,
   getAllTransmissions,
+  getIdNameAspirations,
+  getIdNameBrands,
+  getIdNameCars, 
+  getIdNameColors,
+  getIdNameDrivetrains,
+  getIdNameEngines,
+  getIdNameTransmissions,
   getAspiration,
   getBrand,
   getCar,

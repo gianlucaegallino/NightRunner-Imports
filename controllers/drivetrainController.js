@@ -1,4 +1,19 @@
+const { body, validationResult } = require("express-validator");
 const db = require("../db/queries");
+
+const alphaErr = "must be non numeric.";
+const lengthErr = "must be between 1 and 32 characters.";
+
+//TODO: fix isnumeric validations
+const validateDrivetrain = [
+  body("type")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 32 })
+    .withMessage(`Type ${lengthErr}`),
+];
 
 async function getAll(req, res) {
   try {
@@ -30,7 +45,7 @@ async function getSpecific(req, res) {
       title: "Drivetrain",
       messages: messages.rows,
       pathname: "drivetrain",
-      fieldId: id
+      fieldId: id,
     });
   } catch (error) {
     console.error(error);
@@ -52,7 +67,9 @@ async function getModification(req, res) {
       title: "Edit Drivetrain",
       messages: messages.rows,
       pathname: "drivetrain",
-      fieldId: id
+      fieldId: id,
+      FKFields: {},
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
@@ -60,25 +77,54 @@ async function getModification(req, res) {
   }
 }
 
-async function postModification(req, res) {
-  let id = req.params.id;
-  let type = req.body.type;
+let postModification = [
+  validateDrivetrain,
+  async (req, res) => {
+    let id = req.params.id;
+    let type = req.body.type;
 
-  try {
-    const updated = await db.updateDrivetrain(id, type);
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getDrivetrain(id);
+        return res.status(400).render("itemEditPage", {
+          title: "Edit Drivetrain",
+          messages: messages.rows,
+          pathname: "drivetrain",
+          fieldId: id,
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
 
-    if (!updated) {
-      return res.status(404).json({ message: "Drivetrain not found" });
+      const updated = await db.updateDrivetrain(id, type);
+
+      if (!updated) {
+        const messages = await db.getDrivetrain(id);
+        return res.status(404).render("itemEditPage", {
+          title: "Edit Drivetrain",
+          messages: messages.rows,
+          pathname: "drivetrain",
+          fieldId: id,
+          FKFields: {},
+          notifications: [{ msg: "Drivetrain update failed." }],
+        });
+      }
+
+      const messages = await db.getDrivetrain(id);
+      return res.status(400).render("itemEditPage", {
+        title: "Edit Drivetrain",
+        messages: messages.rows,
+        pathname: "drivetrain",
+        fieldId: id,
+        FKFields: {},
+        notifications: [{ msg: "Updated successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-   
-  } catch (error) {
-    console.error(error);
-
-  }
-
-  res.redirect("/");
-}
+  },
+];
 
 async function postAddition(req, res) {
   let type = req.body.type;
