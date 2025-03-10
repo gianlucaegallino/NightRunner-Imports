@@ -1,7 +1,34 @@
 const { body, validationResult } = require("express-validator");
 const db = require("../db/queries");
 
-//TODO: agregar
+const alphaErr = "must be non numeric.";
+const numErr = "must be numeric.";
+const lengthErr1 = "must be between 1 and 255 characters.";
+const lengthErr2 = "must be between 4 characters long.";
+const lengthErr3 = "must be between 1 and 32 characters.";
+
+const validateBrand = [
+  body("name")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 255 })
+    .withMessage(`Type ${lengthErr1}`),
+  body("year_est")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength(4)
+    .withMessage(`Type ${lengthErr2}`),
+  body("founder")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 32 })
+    .withMessage(`Type ${lengthErr3}`),
+];
 
 async function getAll(req, res) {
   try {
@@ -33,14 +60,13 @@ async function getSpecific(req, res) {
       title: "Brand",
       messages: messages.rows,
       pathname: "brand",
-      fieldId: id
+      fieldId: id,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
 }
-
 
 async function getModification(req, res) {
   let id = req.params.id;
@@ -58,6 +84,7 @@ async function getModification(req, res) {
       pathname: "brand",
       fieldId: id,
       FKFields: {},
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
@@ -65,32 +92,61 @@ async function getModification(req, res) {
   }
 }
 
-async function postModification(req, res) {
-  let id = req.params.id;
-  let name = req.body.name;
-  let year = req.body.year_est;
-  let founder = req.body.founder;
+let postModification = [
+  validateBrand,
+  async (req, res) => {
+    let id = req.params.id;
+    let name = req.body.name;
+    let year = req.body.year_est;
+    let founder = req.body.founder;
 
-  try {
-    const updated = await db.updateBrand(id, name, year, founder);
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getBrand(id);
+        return res.status(400).render("itemEditPage", {
+          title: "Edit Brand",
+          messages: messages.rows,
+          pathname: "brand",
+          fieldId: id,
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
 
-    if (!updated) {
-      return res.status(404).json({ message: "Brand not found" });
+      const updated = await db.updateBrand(id, name, year, founder);
+
+      if (!updated) {
+        const messages = await db.getBrand(id);
+        return res.status(404).render("itemEditPage", {
+          title: "Edit Brand",
+          messages: messages.rows,
+          pathname: "brand",
+          fieldId: id,
+          FKFields: {},
+          notifications: [{ msg: "Brand update failed." }],
+        });
+      }
+
+      const messages = await db.getBrand(id);
+      return res.status(400).render("itemEditPage", {
+        title: "Edit Brand",
+        messages: messages.rows,
+        pathname: "brand",
+        fieldId: id,
+        FKFields: {},
+        notifications: [{ msg: "Updated successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-   
-  } catch (error) {
-    console.error(error);
-
-  }
-
-  res.redirect("/");
-}
+  },
+];
 
 async function postAddition(req, res) {
-    let name = req.body.name;
-    let year = req.body.year;
-    let founder = req.body.founder;
+  let name = req.body.name;
+  let year = req.body.year;
+  let founder = req.body.founder;
 
   try {
     const inserted = await db.insertBrand(name, year, founder);

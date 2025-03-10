@@ -1,7 +1,59 @@
 const db = require("../db/queries");
 
+const alphaErr = "must be non numeric.";
+const numErr = "must be an integer.";
+const lengthErr1 = "must be between 1 and 128 characters.";
+const lengthErr2 = "must be between 1 and 12 characters.";
+const lengthErr3 = "must have at least 1 number.";
+const validDateErr = "must be a valid date.";
 
-//TODO: agregar
+//its only necessary to verify the non foreign fields.
+
+const validateCar = [
+  body("modelname")
+    .trim()
+    .not()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 128 })
+    .withMessage(`Type ${lengthErr1}`),
+  body("enginesize")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${alphaErr}`)
+    .isLength({ min: 1, max: 12 })
+    .withMessage(`Type ${lengthErr2}`),
+  body("horsepower")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength({ min: 1 })
+    .withMessage(`Type ${lengthErr3}`),
+  body("torque")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength({ min: 1 })
+    .withMessage(`Type ${lengthErr3}`),
+  body("weightkg")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength({ min: 1 })
+    .withMessage(`Type ${lengthErr3}`),
+  body("year")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength({ min: 3, max: 4 })
+    .withMessage(`Type ${validDateErr}`),
+  body("mileage")
+    .trim()
+    .isNumeric()
+    .withMessage(`Type ${numErr}`)
+    .isLength({ min: 1 })
+    .withMessage(`Type ${lengthErr3}`),
+];
 
 async function getAll(req, res) {
   try {
@@ -29,12 +81,11 @@ async function getSpecific(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
-
     res.render("itemDetailPage", {
       title: "Car",
       messages: messages.rows,
       pathname: "car",
-      fieldId: id
+      fieldId: id,
     });
   } catch (error) {
     console.error(error);
@@ -54,7 +105,7 @@ async function getModification(req, res) {
     drivetrainid: await db.getIdNameDrivetrains(),
     transmissionid: await db.getIdNameTransmissions(),
     aspirationid: await db.getIdNameAspirations(),
-  }
+  };
 
   try {
     const messages = await db.getCar(id);
@@ -63,14 +114,13 @@ async function getModification(req, res) {
       return res.status(404).json({ message: "Car not found" });
     }
 
-
-
     res.render("itemEditPage", {
       title: "Edit Car",
       messages: messages.rows,
       pathname: "car",
-      fieldId: id, 
-      FKFields: FKFields
+      fieldId: id,
+      FKFields: FKFields,
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
@@ -78,41 +128,80 @@ async function getModification(req, res) {
   }
 }
 
-async function postModification(req, res) {
-  let id = req.params.id;
+let postModification = [
+  validateCar,
+  async (req, res) => {
+    let id = req.params.id;
 
-  // builds the cardata object
-  let carData = {
-    modelname: req.body.modelname,
-    brandid: req.body.brandid,
-    engineid: req.body.engineid,
-    enginesize: req.body.enginesize,
-    horsepower: req.body.horsepower,
-    torque: req.body.torque,
-    weightkg: req.body.weightkg,
-    year: req.body.year,
-    colorid: req.body.colorid,
-    mileage: req.body.mileage,
-    drivetrainid: req.body.drivetrainid,
-    transmissionid: req.body.transmissionid,
-    aspirationid: req.body.aspirationid,
-  };
+    //Declares fields to be interpreted as dropdown fields in reference to other tables
+    const FKFields = {
+      brandid: await db.getIdNameBrands(),
+      engineid: await db.getIdNameEngines(),
+      colorid: await db.getIdNameColors(),
+      drivetrainid: await db.getIdNameDrivetrains(),
+      transmissionid: await db.getIdNameTransmissions(),
+      aspirationid: await db.getIdNameAspirations(),
+    };
 
-  try {
-    const updated = await db.updateCar(id, carData);
+    // builds the cardata object
+    let carData = {
+      modelname: req.body.modelname,
+      brandid: req.body.brandid,
+      engineid: req.body.engineid,
+      enginesize: req.body.enginesize,
+      horsepower: req.body.horsepower,
+      torque: req.body.torque,
+      weightkg: req.body.weightkg,
+      year: req.body.year,
+      colorid: req.body.colorid,
+      mileage: req.body.mileage,
+      drivetrainid: req.body.drivetrainid,
+      transmissionid: req.body.transmissionid,
+      aspirationid: req.body.aspirationid,
+    };
 
-    if (!updated) {
-      return res.status(404).json({ message: "Car not found" });
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getCar(id);
+        return res.status(400).render("itemEditPage", {
+          title: "Edit Car",
+          messages: messages.rows,
+          pathname: "car",
+          fieldId: id,
+          FKFields: FKFields,
+          notifications: errors.errors,
+        });
+      }
+
+      const updated = await db.updateCar(id, carData);
+
+      if (!updated) {
+        const messages = await db.getCar(id);
+        return res.status(404).render("itemEditPage", {
+          title: "Edit Car",
+          messages: messages.rows,
+          pathname: "car",
+          fieldId: id,
+          FKFields: FKFields,
+          notifications: [{ msg: "Car update failed." }],
+        });
+      }
+
+      const messages = await db.getCar(id);
+      return res.status(400).render("itemEditPage", {
+        title: "Edit Car",
+        messages: messages.rows,
+        pathname: "car",
+        fieldId: id,
+        FKFields: FKFields,
+        notifications: [{ msg: "Updated successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
     }
-
-
-  } catch (error) {
-    console.error(error);
-
-  }
-
-  res.redirect("/");
-}
+  },
+];
 
 async function postAddition(req, res) {
   // builds the cardata object
