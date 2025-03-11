@@ -96,8 +96,18 @@ let postModification = [
           notifications: errors.errors,
         });
       }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllDrivetrains();
 
-      const updated = await db.updateDrivetrain(id, type);
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat ? false : await db.updateDrivetrain(id, type);
 
       if (!updated) {
         const messages = await db.getDrivetrain(id);
@@ -107,7 +117,7 @@ let postModification = [
           pathname: "drivetrain",
           fieldId: id,
           FKFields: {},
-          notifications: [{ msg: "Drivetrain update failed." }],
+          notifications: [{ msg: "This column name already exists." }],
         });
       }
 
@@ -130,7 +140,18 @@ async function postAddition(req, res) {
   let type = req.body.type;
 
   try {
-    const inserted = await db.insertDrivetrain(type);
+    //do a validation for repears in certain fields
+    const presentfields = await db.getAllDrivetrains();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].type == type) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat ? false : await db.insertDrivetrain(type);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert drivetrain failed" });

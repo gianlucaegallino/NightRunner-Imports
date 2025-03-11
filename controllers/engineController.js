@@ -96,7 +96,18 @@ let postModification = [
           notifications: errors.errors,
         });
       }
-      const updated = await db.updateEngine(id, type);
+       //do a validation for repears in certain fields
+       const presentfields = await db.getAllEngines();
+ 
+       let isrepeat = false;
+ 
+       for (let i = 0; i < presentfields.rowCount; i++) {
+         if (presentfields.rows[i].type == type) {
+           isrepeat = true;
+         }
+       }
+ 
+       const updated = isrepeat ? false : await db.updateEngine(id, type);
 
       if (!updated) {
         const messages = await db.getEngine(id);
@@ -106,7 +117,7 @@ let postModification = [
           pathname: "engine",
           fieldId: id,
           FKFields: {},
-          notifications: [{ msg: "Engine update failed." }],
+          notifications: [{ msg: "This column name already exists." }],
         });
       }
 
@@ -129,7 +140,18 @@ async function postAddition(req, res) {
   let type = req.body.type;
 
   try {
-    const inserted = await db.insertEngine(type);
+//do a validation for repears in certain fields
+    const presentfields = await db.getAllEngines();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].type == type) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat ? false : await db.insertEngine(type);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert Engine failed" });

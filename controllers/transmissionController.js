@@ -96,8 +96,18 @@ let postModification = [
           notifications: errors.errors,
         });
       }
+//do a validation for repears in certain fields
+      const presentfields = await db.getAllTransmissions();
 
-      const updated = await db.updateTransmission(id, type);
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat ? false : await db.updateTransmission(id, type);
 
       if (!updated) {
         const messages = await db.getTransmission(id);
@@ -130,7 +140,18 @@ async function postAddition(req, res) {
   let type = req.body.type;
 
   try {
-    const inserted = await db.insertTransmission(type);
+//do a validation for repears in certain fields
+    const presentfields = await db.getAllTransmissions();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].type == type) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat ? false : await db.insertTransmission(type);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert Transmission failed" });

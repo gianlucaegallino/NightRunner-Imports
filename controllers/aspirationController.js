@@ -96,8 +96,18 @@ let postModification = [
           notifications: errors.errors,
         });
       }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllAspirations();
 
-      const updated = await db.updateAspiration(id, type);
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat ? false : await db.updateAspiration(id, type);
 
       if (!updated) {
         const messages = await db.getAspiration(id);
@@ -107,7 +117,7 @@ let postModification = [
           pathname: "aspiration",
           fieldId: id,
           FKFields: {},
-          notifications: [{ msg: "Aspiration update failed." }],
+          notifications: [{ msg: "This column name already exists." }],
         });
       }
 
@@ -130,7 +140,18 @@ async function postAddition(req, res) {
   let type = req.body.type;
 
   try {
-    const inserted = await db.insertAspiration(type);
+    //do a validation for repears in certain fields
+    const presentfields = await db.getAllAspirations();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].type == type) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat ? false : await db.insertAspiration(type);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert aspiration failed" });

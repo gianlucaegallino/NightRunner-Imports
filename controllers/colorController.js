@@ -97,7 +97,18 @@ let postModification = [
         });
       }
 
-      const updated = await db.updateColor(id, name);
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllColors();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].name == name) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat ? false : await db.updateColor(id, name);
 
       if (!updated) {
         const messages = await db.getColor(id);
@@ -107,7 +118,7 @@ let postModification = [
           pathname: "color",
           fieldId: id,
           FKFields: {},
-          notifications: [{ msg: "Color update failed." }],
+          notifications: [{ msg: "This column name already exists." }],
         });
       }
 
@@ -130,7 +141,18 @@ async function postAddition(req, res) {
   let name = req.body.name;
 
   try {
-    const inserted = await db.insertColor(name);
+//do a validation for repears in certain fields
+    const presentfields = await db.getAllColors();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].name == name) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat ? false : await db.insertColor(name);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert color failed" });
