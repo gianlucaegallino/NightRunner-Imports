@@ -141,7 +141,7 @@ async function postAddition(req, res) {
   let name = req.body.name;
 
   try {
-//do a validation for repears in certain fields
+    //do a validation for repears in certain fields
     const presentfields = await db.getAllColors();
 
     let isrepeat = false;

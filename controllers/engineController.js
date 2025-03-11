@@ -96,18 +96,18 @@ let postModification = [
           notifications: errors.errors,
         });
       }
-       //do a validation for repears in certain fields
-       const presentfields = await db.getAllEngines();
- 
-       let isrepeat = false;
- 
-       for (let i = 0; i < presentfields.rowCount; i++) {
-         if (presentfields.rows[i].type == type) {
-           isrepeat = true;
-         }
-       }
- 
-       const updated = isrepeat ? false : await db.updateEngine(id, type);
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllEngines();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat ? false : await db.updateEngine(id, type);
 
       if (!updated) {
         const messages = await db.getEngine(id);
@@ -140,7 +140,7 @@ async function postAddition(req, res) {
   let type = req.body.type;
 
   try {
-//do a validation for repears in certain fields
+    //do a validation for repears in certain fields
     const presentfields = await db.getAllEngines();
 
     let isrepeat = false;

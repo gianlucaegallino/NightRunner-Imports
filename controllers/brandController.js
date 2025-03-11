@@ -113,8 +113,20 @@ let postModification = [
           notifications: errors.errors,
         });
       }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllBrands();
 
-      const updated = await db.updateBrand(id, name, year, founder);
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].name == name) {
+          isrepeat = true;
+        }
+      }
+
+      const updated = isrepeat
+        ? false
+        : await db.updateBrand(id, name, year, founder);
 
       if (!updated) {
         const messages = await db.getBrand(id);
@@ -124,7 +136,7 @@ let postModification = [
           pathname: "brand",
           fieldId: id,
           FKFields: {},
-          notifications: [{ msg: "Brand update failed." }],
+          notifications: [{ msg: "This brand already exists." }],
         });
       }
 
@@ -149,7 +161,20 @@ async function postAddition(req, res) {
   let founder = req.body.founder;
 
   try {
-    const inserted = await db.insertBrand(name, year, founder);
+    //do a validation for repears in certain fields
+    const presentfields = await db.getAllBrands();
+
+    let isrepeat = false;
+
+    for (let i = 0; i < presentfields.rowCount; i++) {
+      if (presentfields.rows[i].name == name) {
+        isrepeat = true;
+      }
+    }
+
+    const inserted = isrepeat
+      ? false
+      : await db.insertBrand(name, year, founder);
 
     if (!inserted) {
       return res.status(404).json({ message: "Insert Brand failed" });
