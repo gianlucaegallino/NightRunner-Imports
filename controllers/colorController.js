@@ -10,9 +10,9 @@ const validateColor = [
     .trim()
     .not()
     .isNumeric()
-    .withMessage(`Type ${alphaErr}`)
+    .withMessage(`Name ${alphaErr}`)
     .isLength({ min: 1, max: 64 })
-    .withMessage(`Type ${lengthErr}`),
+    .withMessage(`Name ${lengthErr}`),
 ];
 
 async function getAll(req, res) {
@@ -103,7 +103,7 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].name == name) {
+        if (presentfields.rows[i].name == name && presentfields.rows[i].id != id) {
           isrepeat = true;
         }
       }

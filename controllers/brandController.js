@@ -12,22 +12,22 @@ const validateBrand = [
     .trim()
     .not()
     .isNumeric()
-    .withMessage(`Type ${alphaErr}`)
+    .withMessage(`Name ${alphaErr}`)
     .isLength({ min: 1, max: 255 })
-    .withMessage(`Type ${lengthErr1}`),
+    .withMessage(`Name ${lengthErr1}`),
   body("year_est")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Year of establishment ${numErr}`)
     .isLength(4)
-    .withMessage(`Type ${lengthErr2}`),
+    .withMessage(`Year of establishment ${lengthErr2}`),
   body("founder")
     .trim()
     .not()
     .isNumeric()
-    .withMessage(`Type ${alphaErr}`)
+    .withMessage(`Founder ${alphaErr}`)
     .isLength({ min: 1, max: 32 })
-    .withMessage(`Type ${lengthErr3}`),
+    .withMessage(`Founder ${lengthErr3}`),
 ];
 
 async function getAll(req, res) {
@@ -119,7 +119,7 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].name == name) {
+        if (presentfields.rows[i].name == name && presentfields.rows[i].id != id) {
           isrepeat = true;
         }
       }

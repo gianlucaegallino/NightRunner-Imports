@@ -102,7 +102,7 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].type == type) {
+        if (presentfields.rows[i].type == type && presentfields.rows[i].id != id) {
           isrepeat = true;
         }
       }

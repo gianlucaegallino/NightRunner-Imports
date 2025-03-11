@@ -15,45 +15,45 @@ const validateCar = [
     .trim()
     .not()
     .isNumeric()
-    .withMessage(`Type ${alphaErr}`)
+    .withMessage(`Model name ${alphaErr}`)
     .isLength({ min: 1, max: 128 })
-    .withMessage(`Type ${lengthErr1}`),
+    .withMessage(`Model name ${lengthErr1}`),
   body("enginesize")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${alphaErr}`)
+    .withMessage(`Engine size ${alphaErr}`)
     .isLength({ min: 1, max: 12 })
-    .withMessage(`Type ${lengthErr2}`),
+    .withMessage(`Engine size ${lengthErr2}`),
   body("horsepower")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Horsepower ${numErr}`)
     .isLength({ min: 1 })
-    .withMessage(`Type ${lengthErr3}`),
+    .withMessage(`Horsepower ${lengthErr3}`),
   body("torque")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Torque ${numErr}`)
     .isLength({ min: 1 })
-    .withMessage(`Type ${lengthErr3}`),
+    .withMessage(`Torque ${lengthErr3}`),
   body("weightkg")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Weight ${numErr}`)
     .isLength({ min: 1 })
-    .withMessage(`Type ${lengthErr3}`),
+    .withMessage(`Weight ${lengthErr3}`),
   body("year")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Year ${numErr}`)
     .isLength({ min: 3, max: 4 })
-    .withMessage(`Type ${validDateErr}`),
+    .withMessage(`Year ${validDateErr}`),
   body("mileage")
     .trim()
     .isNumeric()
-    .withMessage(`Type ${numErr}`)
+    .withMessage(`Mileage ${numErr}`)
     .isLength({ min: 1 })
-    .withMessage(`Type ${lengthErr3}`),
+    .withMessage(`Mileage ${lengthErr3}`),
 ];
 
 async function getAll(req, res) {
@@ -180,7 +180,7 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].modelname == carData.modelname) {
+        if (presentfields.rows[i].modelname == carData.modelname && presentfields.rows[i].id != id) {
           isrepeat = true;
         }
       }
