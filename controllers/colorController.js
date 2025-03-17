@@ -103,7 +103,10 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].name == name && presentfields.rows[i].id != id) {
+        if (
+          presentfields.rows[i].name == name &&
+          presentfields.rows[i].id != id
+        ) {
           isrepeat = true;
         }
       }
@@ -137,36 +140,81 @@ let postModification = [
   },
 ];
 
-async function postAddition(req, res) {
-  let name = req.body.name;
-
+async function getAddition(req, res) {
   try {
-    //do a validation for repears in certain fields
-    const presentfields = await db.getAllColors();
+    const messages = await db.getAllColors();
 
-    let isrepeat = false;
-
-    for (let i = 0; i < presentfields.rowCount; i++) {
-      if (presentfields.rows[i].name == name) {
-        isrepeat = true;
-      }
+    if (!messages) {
+      return res.status(404).json({ message: "Colors not found" });
     }
 
-    const inserted = isrepeat ? false : await db.insertColor(name);
-
-    if (!inserted) {
-      return res.status(404).json({ message: "Insert color failed" });
-    }
-
-    res.json({ message: "Color inserted successfully", target: inserted });
+    res.render("itemAddPage", {
+      title: "Add Color",
+      messages: messages.fields,
+      pathname: "color",
+      FKFields: {},
+      notifications: [{ msg: "" }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
 
+let postAddition = [
+  validateColor,
+  async (req, res) => {
+    let name = req.body.name;
+
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getAllColors();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Color",
+          messages: messages.fields,
+          pathname: "color",
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllColors();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].name == name) {
+          isrepeat = true;
+        }
+      }
+
+      const inserted = isrepeat ? false : await db.insertColor(name);
+
+      if (!inserted) {
+        const messages = await db.getAllColors();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Color",
+          messages: messages.fields,
+          pathname: "color",
+          FKFields: {},
+          notifications: [{ msg: "This color name already exists." }],
+        });
+      }
+
+      const messages = await db.getAllColors();
+      return res.status(200).render("itemAddPage", {
+        title: "Add Color",
+        messages: messages.fields,
+        pathname: "color",
+        FKFields: {},
+        notifications: [{ msg: "Color added successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+];
 async function postDeletion(req, res) {
   let id = req.params.id;
 
@@ -190,6 +238,7 @@ module.exports = {
   getAll,
   getSpecific,
   getModification,
+  getAddition,
   postAddition,
   postDeletion,
   postModification,

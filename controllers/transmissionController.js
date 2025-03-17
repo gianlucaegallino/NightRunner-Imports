@@ -102,7 +102,10 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].type == type && presentfields.rows[i].id != id) {
+        if (
+          presentfields.rows[i].type == type &&
+          presentfields.rows[i].id != id
+        ) {
           isrepeat = true;
         }
       }
@@ -122,7 +125,7 @@ let postModification = [
       }
 
       const messages = await db.getTransmission(id);
-      return res.status(400).render("itemEditPage", {
+      return res.status(200).render("itemEditPage", {
         title: "Edit Transmission",
         messages: messages.rows,
         pathname: "transmission",
@@ -136,39 +139,80 @@ let postModification = [
   },
 ];
 
-async function postAddition(req, res) {
-  let type = req.body.type;
-
+async function getAddition(req, res) {
   try {
-    //do a validation for repears in certain fields
-    const presentfields = await db.getAllTransmissions();
+    const messages = await db.getAllTransmissions();
 
-    let isrepeat = false;
-
-    for (let i = 0; i < presentfields.rowCount; i++) {
-      if (presentfields.rows[i].type == type) {
-        isrepeat = true;
-      }
+    if (!messages) {
+      return res.status(404).json({ message: "Transmissions not found" });
     }
 
-    const inserted = isrepeat ? false : await db.insertTransmission(type);
-
-    if (!inserted) {
-      return res.status(404).json({ message: "Insert Transmission failed" });
-    }
-
-    res.json({
-      message: "Transmission inserted successfully",
-      target: inserted,
+    res.render("itemAddPage", {
+      title: "Add Transmission",
+      messages: messages.fields,
+      pathname: "transmission",
+      FKFields: {},
+      notifications: [{ msg: "" }],
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
+let postAddition = [
+  validateTransmission,
+  async (req, res) => {
+    let type = req.body.type;
 
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getAllTransmissions();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Transmission",
+          messages: messages.fields,
+          pathname: "transmission",
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllTransmissions();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const inserted = isrepeat ? false : await db.insertTransmission(type);
+
+      if (!inserted) {
+        const messages = await db.getAllTransmissions();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Transmission",
+          messages: messages.fields,
+          pathname: "transmission",
+          FKFields: {},
+          notifications: [{ msg: "This transmission name already exists." }],
+        });
+      }
+
+      const messages = await db.getAllTransmissions();
+      return res.status(200).render("itemAddPage", {
+        title: "Add Transmission",
+        messages: messages.fields,
+        pathname: "transmission",
+        FKFields: {},
+        notifications: [{ msg: "Transmission added successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+];
 async function postDeletion(req, res) {
   let id = req.params.id;
 
@@ -192,6 +236,7 @@ module.exports = {
   getAll,
   getSpecific,
   getModification,
+  getAddition,
   postAddition,
   postDeletion,
   postModification,

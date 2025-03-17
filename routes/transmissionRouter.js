@@ -5,9 +5,9 @@ const transmissionRouter = Router();
 transmissionRouter.get("/", transmissionController.getAll);
 transmissionRouter.get("/:id", transmissionController.getSpecific);
 transmissionRouter.get("/:id/update", transmissionController.getModification);
+transmissionRouter.get("/new", transmissionController.getAddition);
 transmissionRouter.post("/:id/update", transmissionController.postModification);
 transmissionRouter.post("/:id/delete", transmissionController.postDeletion);
 transmissionRouter.post("/new", transmissionController.postAddition);
-
 
 module.exports = transmissionRouter;

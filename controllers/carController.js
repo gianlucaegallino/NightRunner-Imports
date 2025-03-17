@@ -180,7 +180,10 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].modelname == carData.modelname && presentfields.rows[i].id != id) {
+        if (
+          presentfields.rows[i].modelname == carData.modelname &&
+          presentfields.rows[i].id != id
+        ) {
           isrepeat = true;
         }
       }
@@ -200,7 +203,7 @@ let postModification = [
       }
 
       const messages = await db.getCar(id);
-      return res.status(400).render("itemEditPage", {
+      return res.status(200).render("itemEditPage", {
         title: "Edit Car",
         messages: messages.rows,
         pathname: "car",
@@ -214,50 +217,117 @@ let postModification = [
   },
 ];
 
-async function postAddition(req, res) {
-  // builds the cardata object
-  let carData = {
-    modelname: req.body.modelname,
-    brandid: req.body.brandid,
-    engineid: req.body.engineid,
-    enginesize: req.body.enginesize,
-    horsepower: req.body.horsepower,
-    torque: req.body.torque,
-    weightkg: req.body.weightkg,
-    year: req.body.year,
-    colorid: req.body.colorid,
-    mileage: req.body.mileage,
-    drivetrainid: req.body.drivetrainid,
-    transmissionid: req.body.transmissionid,
-    aspirationid: req.body.aspirationid,
-  };
-
+async function getAddition(req, res) {
   try {
-    //do a validation for repears in certain fields
-    const presentfields = await db.getAllCars();
+    //Declares fields to be interpreted as dropdown fields in reference to other tables
+    const FKFields = {
+      brandid: await db.getIdNameBrands(),
+      engineid: await db.getIdNameEngines(),
+      colorid: await db.getIdNameColors(),
+      drivetrainid: await db.getIdNameDrivetrains(),
+      transmissionid: await db.getIdNameTransmissions(),
+      aspirationid: await db.getIdNameAspirations(),
+    };
 
-    let isrepeat = false;
+    const messages = await db.getAllCars();
 
-    for (let i = 0; i < presentfields.rowCount; i++) {
-      if (presentfields.rows[i].modelname == carData.modelname) {
-        isrepeat = true;
-      }
+    if (!messages) {
+      return res.status(404).json({ message: "Cars not found" });
     }
 
-    const inserted = isrepeat ? false : await db.insertCar(carData);
-
-    if (!inserted) {
-      return res.status(404).json({ message: "Insert Car failed" });
-    }
-
-    res.json({ message: "Car inserted successfully", target: inserted });
+    res.render("itemAddPage", {
+      title: "Add Car",
+      messages: messages.fields,
+      pathname: "car",
+      FKFields: FKFields,
+      notifications: [{ msg: "" }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
+
+let postAddition = [
+  validateCar,
+  async (req, res) => {
+    // builds the cardata object
+    let carData = {
+      modelname: req.body.modelname,
+      brandid: req.body.brandid,
+      engineid: req.body.engineid,
+      enginesize: req.body.enginesize,
+      horsepower: req.body.horsepower,
+      torque: req.body.torque,
+      weightkg: req.body.weightkg,
+      year: req.body.year,
+      colorid: req.body.colorid,
+      mileage: req.body.mileage,
+      drivetrainid: req.body.drivetrainid,
+      transmissionid: req.body.transmissionid,
+      aspirationid: req.body.aspirationid,
+    };
+
+    //Declares fields to be interpreted as dropdown fields in reference to other tables
+    const FKFields = {
+      brandid: await db.getIdNameBrands(),
+      engineid: await db.getIdNameEngines(),
+      colorid: await db.getIdNameColors(),
+      drivetrainid: await db.getIdNameDrivetrains(),
+      transmissionid: await db.getIdNameTransmissions(),
+      aspirationid: await db.getIdNameAspirations(),
+    };
+
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getAllCars();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Car",
+          messages: messages.fields,
+          pathname: "car",
+          FKFields: FKFields,
+          notifications: errors.errors,
+        });
+      }
+
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllCars();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].modelname == carData.modelname) {
+          isrepeat = true;
+        }
+      }
+
+      const inserted = isrepeat ? false : await db.insertCar(carData);
+
+      if (!inserted) {
+        const messages = await db.getAllCars();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Car",
+          messages: messages.fields,
+          pathname: "car",
+          FKFields: FKFields,
+          notifications: [{ msg: "A car with this name already exists." }],
+        });
+      }
+
+      const messages = await db.getAllCars();
+      return res.status(200).render("itemAddPage", {
+        title: "Add Car",
+        messages: messages.fields,
+        pathname: "car",
+        FKFields: FKFields,
+        notifications: [{ msg: "Car added successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+];
 
 async function postDeletion(req, res) {
   let id = req.body.id;
@@ -282,6 +352,7 @@ module.exports = {
   getAll,
   getSpecific,
   getModification,
+  getAddition,
   postAddition,
   postDeletion,
   postModification,

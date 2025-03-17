@@ -1,0 +1,59 @@
+<html>
+  <head>
+    <title>Add item</title>
+    <link rel="stylesheet" href="/normalize.css" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+
+  <body>
+    <h1><%= title %></h1>
+    <h2>This will be its contents.</h2>
+
+    <%if (messages.length> 0) {%>
+    <form method="POST" action="/<%= pathname %>/new" class="form">
+      <% let names=messages.map((obj)=>{ return obj.name; }); let foreigns =
+      Object.keys(FKFields); for (let i = 1; i < names.length; i++){
+      if(!foreigns.includes(names[i])){ %>
+
+      <div className="myInput">
+        <label>
+          <%=names[i]%>
+          <input
+            value=""
+            type="text"
+            name="<%=names[i]%>"
+            placeholder="<%=names[i]%>"
+          />
+        </label>
+      </div>
+
+      <%} else { %>
+
+        <div className="myDropdown">
+        <label>
+          <%=names[i]%>
+          <select name="<%=names[i]%>" id="<%=names[i]%>" required >
+            <%
+            for(let j  = 0; j<FKFields[`${names[i]}`].rows.length; j++){
+                %>
+                <option value="<%=Object.values(FKFields[`${names[i]}`].rows[j])[0]%>"><%=Object.values(FKFields[`${names[i]}`].rows[j])[1]%></option>
+                <%
+              }
+            %>
+            
+            
+          </select>
+        </label>
+      </div>
+
+      <%} }}%>
+
+      <button type="submit">Add entry</button>
+    </form>
+
+    <% if (notifications){ for (let i=0; i<
+    Object.keys(notifications).length;i++){ %>
+    <p><%=notifications[i].msg%></p>
+    <% } } %>
+  </body>
+</html>

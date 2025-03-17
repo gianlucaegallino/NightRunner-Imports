@@ -102,7 +102,10 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].type == type && presentfields.rows[i].id != id) {
+        if (
+          presentfields.rows[i].type == type &&
+          presentfields.rows[i].id != id
+        ) {
           isrepeat = true;
         }
       }
@@ -122,7 +125,7 @@ let postModification = [
       }
 
       const messages = await db.getEngine(id);
-      return res.status(400).render("itemEditPage", {
+      return res.status(200).render("itemEditPage", {
         title: "Edit Engine",
         messages: messages.rows,
         pathname: "engine",
@@ -136,35 +139,81 @@ let postModification = [
   },
 ];
 
-async function postAddition(req, res) {
-  let type = req.body.type;
-
+async function getAddition(req, res) {
   try {
-    //do a validation for repears in certain fields
-    const presentfields = await db.getAllEngines();
+    const messages = await db.getAllEngines();
 
-    let isrepeat = false;
-
-    for (let i = 0; i < presentfields.rowCount; i++) {
-      if (presentfields.rows[i].type == type) {
-        isrepeat = true;
-      }
+    if (!messages) {
+      return res.status(404).json({ message: "Engine not found" });
     }
 
-    const inserted = isrepeat ? false : await db.insertEngine(type);
-
-    if (!inserted) {
-      return res.status(404).json({ message: "Insert Engine failed" });
-    }
-
-    res.json({ message: "Engine inserted successfully", target: inserted });
+    res.render("itemAddPage", {
+      title: "Add Engine",
+      messages: messages.fields,
+      pathname: "engine",
+      FKFields: {},
+      notifications: [{ msg: "" }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
+
+let postAddition = [
+  validateEngine,
+  async (req, res) => {
+    let type = req.body.type;
+
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getAllEngines();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Engine",
+          messages: messages.fields,
+          pathname: "engine",
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllEngines();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].type == type) {
+          isrepeat = true;
+        }
+      }
+
+      const inserted = isrepeat ? false : await db.insertEngine(type);
+
+      if (!inserted) {
+        const messages = await db.getAllEngines();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Engine",
+          messages: messages.fields,
+          pathname: "engine",
+          FKFields: {},
+          notifications: [{ msg: "This Engine name already exists." }],
+        });
+      }
+
+      const messages = await db.getAllEngines();
+      return res.status(200).render("itemAddPage", {
+        title: "Add Engine",
+        messages: messages.fields,
+        pathname: "engine",
+        FKFields: {},
+        notifications: [{ msg: "Engine added successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+];
 
 async function postDeletion(req, res) {
   let id = req.params.id;
@@ -189,6 +238,7 @@ module.exports = {
   getAll,
   getSpecific,
   getModification,
+  getAddition,
   postAddition,
   postDeletion,
   postModification,

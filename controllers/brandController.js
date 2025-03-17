@@ -119,7 +119,10 @@ let postModification = [
       let isrepeat = false;
 
       for (let i = 0; i < presentfields.rowCount; i++) {
-        if (presentfields.rows[i].name == name && presentfields.rows[i].id != id) {
+        if (
+          presentfields.rows[i].name == name &&
+          presentfields.rows[i].id != id
+        ) {
           isrepeat = true;
         }
       }
@@ -155,39 +158,85 @@ let postModification = [
   },
 ];
 
-async function postAddition(req, res) {
-  let name = req.body.name;
-  let year = req.body.year;
-  let founder = req.body.founder;
-
+async function getAddition(req, res) {
   try {
-    //do a validation for repears in certain fields
-    const presentfields = await db.getAllBrands();
+    const messages = await db.getAllBrands();
 
-    let isrepeat = false;
-
-    for (let i = 0; i < presentfields.rowCount; i++) {
-      if (presentfields.rows[i].name == name) {
-        isrepeat = true;
-      }
+    if (!messages) {
+      return res.status(404).json({ message: "Brands not found" });
     }
 
-    const inserted = isrepeat
-      ? false
-      : await db.insertBrand(name, year, founder);
-
-    if (!inserted) {
-      return res.status(404).json({ message: "Insert Brand failed" });
-    }
-
-    res.json({ message: "Brand inserted successfully", target: inserted });
+    res.render("itemAddPage", {
+      title: "Add Brand",
+      messages: messages.fields,
+      pathname: "brand",
+      FKFields: {},
+      notifications: [{ msg: "" }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
+
+let postAddition = [
+  validateBrand,
+  async (req, res) => {
+    let name = req.body.name;
+    let year = req.body.year;
+    let founder = req.body.founder;
+
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        const messages = await db.getAllBrands();
+        res.render("itemAddPage", {
+          title: "Add Brand",
+          messages: messages.fields,
+          pathname: "brand",
+          FKFields: {},
+          notifications: errors.errors,
+        });
+      }
+      //do a validation for repears in certain fields
+      const presentfields = await db.getAllBrands();
+
+      let isrepeat = false;
+
+      for (let i = 0; i < presentfields.rowCount; i++) {
+        if (presentfields.rows[i].name == name) {
+          isrepeat = true;
+        }
+      }
+
+      const inserted = isrepeat
+        ? false
+        : await db.insertBrand(name, year, founder);
+
+      if (!inserted) {
+        const messages = await db.getAllBrands();
+        return res.status(400).render("itemAddPage", {
+          title: "Add Brand",
+          messages: messages.fields,
+          pathname: "brand",
+          FKFields: {},
+          notifications: [{ msg: "This column name already exists." }],
+        });
+      }
+
+      const messages = await db.getAllBrands();
+      return res.status(200).render("itemAddPage", {
+        title: "Add Brand",
+        messages: messages.fields,
+        pathname: "brand",
+        FKFields: {},
+        notifications: [{ msg: "Aspiration added successfully." }],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  },
+];
 
 async function postDeletion(req, res) {
   let id = req.params.id;
@@ -212,6 +261,7 @@ module.exports = {
   getAll,
   getSpecific,
   getModification,
+  getAddition,
   postAddition,
   postDeletion,
   postModification,
