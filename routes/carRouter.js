@@ -4,9 +4,10 @@ const carRouter = Router();
 
 
 carRouter.get("/", carController.getAll);
+carRouter.get("/new", carController.getAddition);
 carRouter.get("/:id", carController.getSpecific);
 carRouter.get("/:id/update", carController.getModification);
-carRouter.get("/new", carController.getAddition);
+
 carRouter.post("/:id/update", carController.postModification);
 carRouter.post("/:id/delete", carController.postDeletion);
 carRouter.post("/new", carController.postAddition);

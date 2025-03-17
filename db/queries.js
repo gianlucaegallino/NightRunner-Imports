@@ -66,7 +66,6 @@ async function getAllTransmissions() {
   return contents;
 }
 
-
 // --------------- Name and Id SELECT queries ---------------
 
 async function getIdNameAspirations() {
@@ -230,7 +229,7 @@ async function updateCar(id, carData) {
       drivetrainid,
       transmissionid,
       aspirationid,
-      id
+      id,
     ]
   );
   return contents;
@@ -288,39 +287,37 @@ async function insertBrand(name, year, founder) {
 async function insertCar(carData) {
   //Destructure the car data object
   const {
-    name,
-    brand,
-    engine_type,
-    engine_size,
-    hp,
+    modelname,
+    brandid,
+    engineid,
+    enginesize,
+    horsepower,
     torque,
-    top_speed,
-    weight,
+    weightkg,
     year,
-    color,
+    colorid,
     mileage,
-    drivetrain,
-    transmission,
-    aspiration,
+    drivetrainid,
+    transmissionid,
+    aspirationid,
   } = carData;
 
   let contents = pool.query(
-    "INSERT INTO cars (name, brand, engine_type, engine_size, hp, torque, top_speed, weight, year, color mileage, drivetrain, transmission, aspiration) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)",
+    "INSERT INTO cars (modelname, brandid, engineid, enginesize, horsepower, torque, weightkg, year, colorid, mileage, drivetrainid, transmissionid, aspirationid) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)",
     [
-      name,
-      brand,
-      engine_type,
-      engine_size,
-      hp,
+      modelname,
+      brandid,
+      engineid,
+      enginesize,
+      horsepower,
       torque,
-      top_speed,
-      weight,
+      weightkg,
       year,
-      color,
+      colorid,
       mileage,
-      drivetrain,
-      transmission,
-      aspiration,
+      drivetrainid,
+      transmissionid,
+      aspirationid,
     ]
   );
   return contents;
@@ -361,7 +358,7 @@ module.exports = {
   getAllTransmissions,
   getIdNameAspirations,
   getIdNameBrands,
-  getIdNameCars, 
+  getIdNameCars,
   getIdNameColors,
   getIdNameDrivetrains,
   getIdNameEngines,
