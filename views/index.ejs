@@ -13,5 +13,10 @@
     <a href="/drivetrain">drivetrain</a>
     <a href="/engine">engine</a>
     <a href="/transmission">transmission</a>
+
+    <% if (typeof notifications !== 'undefined'){ for (let i=0; i<
+    Object.keys(notifications).length;i++){ %>
+    <p><%=notifications[i].msg%></p>
+    <% } } %>
   </body>
 </html>

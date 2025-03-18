@@ -217,13 +217,16 @@ async function postDeletion(req, res) {
   let id = req.params.id;
 
   try {
+    await db.deleteTransmissionDep(id);
     const deleted = await db.deleteTransmission(id);
 
     if (!deleted) {
       return res.status(404).json({ message: "Transmission not found" });
     }
 
-    res.json({ message: "Transmission deleted successfully", target: deleted });
+    return res.status(200).render("index.ejs", {
+      notifications: [{ msg: "Transmission and all dependencies deleted." }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

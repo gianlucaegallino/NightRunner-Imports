@@ -219,13 +219,16 @@ async function postDeletion(req, res) {
   let id = req.params.id;
 
   try {
+    await db.deleteColorDep(id);
     const deleted = await db.deleteColor(id);
 
     if (!deleted) {
       return res.status(404).json({ message: "Color not found" });
     }
 
-    res.json({ message: "Color deleted successfully", target: deleted });
+    return res.status(200).render("index.ejs", {
+      notifications: [{ msg: "Color and all dependencies deleted." }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });

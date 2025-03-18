@@ -32,7 +32,7 @@
         <div className="myDropdown">
         <label>
           <%=names[i]%>
-          <select name="<%=names[i]%>" id="<%=names[i]%>" required >
+          <select name="<%=names[i]%>" id="<%=names[i]%>">
             <%
             for(let j  = 0; j<FKFields[`${names[i]}`].rows.length; j++){
                 %>
@@ -51,7 +51,7 @@
       <button type="submit">Add entry</button>
     </form>
 
-    <% if (notifications){ for (let i=0; i<
+    <% if (typeof notifications !== 'undefined'){ for (let i=0; i<
     Object.keys(notifications).length;i++){ %>
     <p><%=notifications[i].msg%></p>
     <% } } %>

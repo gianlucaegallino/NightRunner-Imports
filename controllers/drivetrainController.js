@@ -219,14 +219,16 @@ async function postDeletion(req, res) {
   let id = req.params.id;
 
   try {
+    await db.deleteDrivetrainDep(id);
     const deleted = await db.deleteDrivetrain(id);
 
     if (!deleted) {
       return res.status(404).json({ message: "Drivetrain not found" });
     }
 
-    res.json({ message: "Drivetrain deleted successfully", target: deleted });
-  } catch (error) {
+    return res.status(200).render("index.ejs", {
+      notifications: [{ msg: "Drivetrain and all dependencies deleted." }],
+    });  } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }

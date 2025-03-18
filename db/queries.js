@@ -177,6 +177,36 @@ async function deleteTransmission(id) {
   return contents;
 }
 
+async function deleteAspirationDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE aspirationid = $1", [id]);
+  return contents;
+}
+
+async function deleteBrandDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE brandid = $1", [id]);
+  return contents;
+}
+
+async function deleteColorDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE colorid = $1", [id]);
+  return contents;
+}
+
+async function deleteDrivetrainDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE drivetrainid = $1", [id]);
+  return contents;
+}
+
+async function deleteEngineDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE engineid = $1", [id]);
+  return contents;
+}
+
+async function deleteTransmissionDep(id) {
+  let contents = pool.query("DELETE FROM cars WHERE transmissionid = $1", [id]);
+  return contents;
+}
+
 // --------------- UPDATE queries ---------------
 
 async function updateAspiration(id, type) {
@@ -391,4 +421,10 @@ module.exports = {
   insertDrivetrain,
   insertEngine,
   insertTransmission,
+  deleteAspirationDep,
+  deleteBrandDep,
+  deleteColorDep,
+  deleteDrivetrainDep,
+  deleteEngineDep,
+  deleteTransmissionDep
 };

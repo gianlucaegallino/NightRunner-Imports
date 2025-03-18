@@ -219,19 +219,20 @@ async function postDeletion(req, res) {
   let id = req.params.id;
 
   try {
+    await db.deleteAspirationDep(id);
     const deleted = await db.deleteAspiration(id);
 
     if (!deleted) {
       return res.status(404).json({ message: "Aspiration not found" });
     }
 
-    res.json({ message: "Aspiration deleted successfully", target: deleted });
+    return res.status(200).render("index.ejs", {
+      notifications: [{ msg: "Aspiration and all dependencies deleted." }],
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal server error" });
   }
-
-  res.redirect("/");
 }
 
 module.exports = {

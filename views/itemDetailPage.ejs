@@ -13,27 +13,32 @@
       vals = Object.values(messages[0]); %>
       <p>Object Identifier: <%=vals[0]%></p>
 
-      <% 
-      const foreignKeyFields = {
-    brand_id: "brands",
-    engine_type_id: "engine_types",
-    color_id: "colors"
-};
-
-      
-      for (let i = 1; i < keys.length; i++){ %>
+      <% const foreignKeyFields = { brand_id: "brands", engine_type_id:
+      "engine_types", color_id: "colors" }; for (let i = 1; i < keys.length;
+      i++){ %>
 
       <div className="myInput">
         <label>
           <%=keys[i]%>
-          <input value="<%=vals[i]%>" type="text" placeholder="<%=keys[i]%>" readonly />
+          <input
+            value="<%=vals[i]%>"
+            type="text"
+            placeholder="<%=keys[i]%>"
+            readonly
+          />
         </label>
       </div>
 
       <% }} %>
     </div>
 
-    <a href="">Delete entry</a>
+    <form
+      method="POST"
+      action="/<%= pathname %>/<%= fieldId %>/delete"
+      class="form"
+    >
+      <button type="submit">Delete entry</button>
+    </form>
     <a href="/<%= pathname %>/<%= fieldId %>/update">Edit entry</a>
   </body>
 </html>

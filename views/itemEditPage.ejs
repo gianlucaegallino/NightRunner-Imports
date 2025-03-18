@@ -88,7 +88,7 @@
 
 
     <% 
-      if (notifications){
+      if (typeof notifications !== 'undefined'){
         for (let i = 0; i< Object.keys(notifications).length;i++){
           %>
           <p><%=notifications[i].msg%></p>
